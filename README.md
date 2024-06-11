@@ -1,64 +1,65 @@
-インポートOS
+import os
 
-#保存先のディレクトリ
-save_path = os.path.join(os.path.expanduser('〜')、'ドキュメント'、'dark_horse_app.py')
+# 保存先のディレクトリを指定します
+save_path = os.path.join(os.path.expanduser('~'), 'Documents', 'dark_horse_app.py')
 
-コード = """
-pandasをpdとしてインポートする
-sklearn.model_selection から train_test_split をインポートします
-sklearn.linear_model から LogisticRegression をインポートします
-streamlit を st としてインポートする
+code = """
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+import streamlit as st
 
-#テキストの作成
-データ = {
-    'レースID':[1、1、1、2、2、2]、
-    '馬ID':[101、102、103、201、202、203]、
-    '馬名':[「馬A」、「馬B」、「馬C」、「馬D」、「馬E」、「馬F」]、
-    '騎手'：[「騎手 X」、「騎手 Y」、「騎手 Z」、「騎手 W」、「騎手 V」、「騎手 U」]、
-    'トレーナー'：[「トレーナー M」、「トレーナー N」、「トレーナー O」、「トレーナー P」、「トレーナー Q」、「トレーナー R」]、
-    「オッズ」:[5.0、10.0、15.0、2.5、8.0、20.0]、
-    '終了位置':[1、2、3、1、2、3]
+# 仮想データセットの作成
+data = {
+    'RaceID': [1, 1, 1, 2, 2, 2],
+    'HorseID': [101, 102, 103, 201, 202, 203],
+    'HorseName': ['Horse A', 'Horse B', 'Horse C', 'Horse D', 'Horse E', 'Horse F'],
+    'Jockey': ['Jockey X', 'Jockey Y', 'Jockey Z', 'Jockey W', 'Jockey V', 'Jockey U'],
+    'Trainer': ['Trainer M', 'Trainer N', 'Trainer O', 'Trainer P', 'Trainer Q', 'Trainer R'],
+    'Odds': [5.0, 10.0, 15.0, 2.5, 8.0, 20.0],
+    'FinishPosition': [1, 2, 3, 1, 2, 3]
 }
 
-df = pd.DataFrame(データ)
+df = pd.DataFrame(data)
 
-#データのクレンジング
+# データのクレンジング
 df = df.dropna()
 
-#特徴量エンジニアリング
-df['勝つ']=自由度['終了位置'].apply(lambda x: x == 1 の場合は 1、それ以外の場合は 0)
+# 特徴量エンジニアリング
+df['Win'] = df['FinishPosition'].apply(lambda x: 1 if x == 1 else 0)
 
-#必要な特徴量の選択
-特徴 =[「オッズ」、「勝利」]
-df_features = df[特徴]
+# 必要な特徴量の選択
+features = ['Odds', 'Win']
+df_features = df[features]
 
-#データの分割
-X = df_features[[「オッズ」]]
-y = 特徴量['勝つ']
-X_train、X_test、y_train、y_test = train_test_split(X、y、test_size=0.2、random_state=42) です。
+# データの分割
+X = df_features[['Odds']]
+y = df_features['Win']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-#モデルのトレーニング
-モデル = ロジスティック回帰()
-モデルをフィット(X_train, y_train)
+# モデルのトレーニング
+model = LogisticRegression()
+model.fit(X_train, y_train)
 
-#勝利確率の計算
-df[「勝利確率」]= モデル.予測確率(df[[「オッズ」]]）[:, 1]
+# 勝利確率の計算
+df['WinProbability'] = model.predict_proba(df[['Odds']])[:, 1]
 
-#オッズが高く、勝利確率が一定以上の馬を穴馬として抽出
-閾値確率 = 0.2
-高オッズ閾値 = 10.0
+# オッズが高く、勝利確率が一定以上の馬を穴馬として抽出
+threshold_probability = 0.2
+high_odds_threshold = 10.0
 
-df[「ダークホース」]= df.apply(lambda 行: 行[「勝利確率」]> 閾値確率と行[「オッズ」]> 高オッズ閾値、軸=1)
+df['IsDarkHorse'] = df.apply(lambda row: row['WinProbability'] > threshold_probability and row['Odds'] > high_odds_threshold, axis=1)
 
-ダークホース = df[df[「ダークホース」]]
+dark_horses = df[df['IsDarkHorse']]
 
-#Streamlitインターフェースの作成
+# Streamlitインターフェースの作成
 st.title('穴馬抽出システム')
 if st.button('穴馬を抽出'):
-    st.write(ダークホース[[「馬名」、「オッズ」、「勝率」]]）
-「」
+    st.write(dark_horses[['HorseName', 'Odds', 'WinProbability']])
+"""
 
-open(save_path, 'w') をファイルとして実行します:
-    file.write(コード)
+with open(save_path, 'w') as file:
+    file.write(code)
 
-print(f"スクリプトが{save_path}に保存されました")
+print(f"Script saved to {save_path}")
+
